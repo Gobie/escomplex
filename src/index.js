@@ -23,14 +23,15 @@ exports.processResults = processResults;
  *                            code complexity.
  * @param walker {object}     The AST walker to use against `ast`.
  * @param [options] {object}  Options to modify the complexity calculation.
+ * @param next {function}     Callback to call with error or report.
  *
  */
-function analyse (ast, walker, options) {
+function analyse (ast, walker, options, next) {
     if (check.array(ast)) {
-        return projectHandler.analyse(ast, walker, options);
+        return projectHandler.analyse(ast, walker, options, next);
     }
 
-    return moduleHandler.analyse(ast, walker, options);
+    return moduleHandler.analyse(ast, walker, options, next);
 }
 
 /**
@@ -38,10 +39,11 @@ function analyse (ast, walker, options) {
  *
  * Given an object with an array of results, it returns results with calculated aggregate values.
  *
- * @param report {object}  The report object with an array of results for calculating aggregates.
+ * @param report {object}      The report object with an array of results for calculating aggregates.
  * @param noCoreSize {boolean} Don't compute coresize or the visibility matrix.
+ * @param next {function}      Callback to call with error or results.
  *
  */
-function processResults(report, noCoreSize) {
-    return projectHandler.processResults(report, noCoreSize);
+function processResults(report, noCoreSize, next) {
+    return projectHandler.processResults(report, noCoreSize, next);
 }

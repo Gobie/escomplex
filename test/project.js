@@ -40,33 +40,38 @@ suite('project:', function () {
             assert.isFunction(cr.processResults);
         });
 
-        test('analyse throws when modules is object', function () {
-            assert.throws(function () {
-                cr.analyse({
-                    body: [],
-                    loc: {
-                        start: {
-                            line: 0
-                        },
-                        end: {
-                            line: 0
-                        }
+        test('analyse returns error when modules is object', function (done) {
+            cr.analyse({
+                body: [],
+                loc: {
+                    start: {
+                        line: 0
+                    },
+                    end: {
+                        line: 0
                     }
-                }, mozWalker);
+                }
+            }, mozWalker, null, function(e) {
+                assert.isNotNull(e);
+                done();
             });
         });
 
-        test('analyse does not throw when modules is array', function () {
-            assert.doesNotThrow(function () {
-                cr.analyse([], mozWalker);
+        test('analyse does not return error when modules is array', function (done) {
+            cr.analyse([], mozWalker, null, function(e) {
+                assert.isNull(e);
+                done();
             });
         });
 
         suite('no modules:', function () {
             var result;
 
-            setup(function () {
-                result = cr.analyse([], mozWalker);
+            setup(function (done) {
+                cr.analyse([], mozWalker, null, function(e, r) {
+                    result = r
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -129,11 +134,14 @@ suite('project:', function () {
         suite('two modules:', function () {
             var result;
 
-            setup(function () {
-                result = cr.analyse([
+            setup(function (done) {
+                cr.analyse([
                     { ast: esprima.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }', { loc: true }), path: 'b' },
                     { ast: esprima.parse('if (true) { "foo"; } else { "bar"; }', { loc: true }), path: 'a' }
-                ], mozWalker);
+                ], mozWalker, null, function(e, r) {
+                    result = r
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -285,42 +293,52 @@ suite('project:', function () {
 
         suite('two modules with different options:', function() {
             var modules = [], reportsOnly;
-            setup(function() {
+            setup(function (done) {
                 modules.push({
                     ast: esprima.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }', { loc: true }),
                     path: 'b'
                 });
                 modules.push({ ast: esprima.parse('if (true) { "foo"; } else { "bar"; }', { loc: true }), path: 'a' });
-                reportsOnly = cr.analyse(modules, mozWalker, {skipCalculation: true});
+                cr.analyse(modules, mozWalker, {skipCalculation: true}, function(e, r) {
+                    reportsOnly = r
+                    done(e);
+                });
             });
 
             test('should not have aggregates if we call with skipCalculation', function() {
                 assert.deepEqual(Object.keys(reportsOnly), ['reports']);
             });
 
-            test('should not have coreSize or visibilityMatrix if we call with noCoreSize', function() {
-                var results = cr.analyse(modules, mozWalker, {noCoreSize: true});
-                assert.notOk(results.coreSize);
-                assert.notOk(results.visibilityMatrix);
-                // make sure we still have a few things though
-                assert.ok(results.adjacencyMatrix);
-                assert.ok(results.loc);
+            test('should not have coreSize or visibilityMatrix if we call with noCoreSize', function(done) {
+                cr.analyse(modules, mozWalker, {noCoreSize: true}, function(e, results) {
+                    assert.notOk(results.coreSize);
+                    assert.notOk(results.visibilityMatrix);
+                    // make sure we still have a few things though
+                    assert.ok(results.adjacencyMatrix);
+                    assert.ok(results.loc);
+                    done(e);
+                });
             });
 
-            test('should be able to run processResults', function() {
-                var fullReport, calcReport;
-                fullReport = cr.analyse(modules, mozWalker);
-                calcReport = cr.processResults(reportsOnly);
-                assert.deepEqual(calcReport, fullReport);
+            test('should be able to run processResults', function(done) {
+                cr.analyse(modules, mozWalker, null, function(e, fullReport) {
+                    if (e) return done(e);
+                    cr.processResults(reportsOnly, null, function(e, calcReport) {
+                        assert.deepEqual(calcReport, fullReport);
+                        done(e);
+                    });
+                });
             });
 
-            test('should be able to run processResults without calculating coreSize', function() {
-                var results = cr.processResults(reportsOnly, true);
-                assert.notOk(results.coreSize);
-                assert.notOk(results.visibilityMatrix);
-                // make sure we still have a few things though
-                assert.ok(results.adjacencyMatrix);
-                assert.ok(results.loc);
+            test('should be able to run processResults without calculating coreSize', function(done) {
+                cr.processResults(reportsOnly, true, function(e, results) {
+                    assert.notOk(results.coreSize);
+                    assert.notOk(results.visibilityMatrix);
+                    // make sure we still have a few things though
+                    assert.ok(results.adjacencyMatrix);
+                    assert.ok(results.loc);
+                    done(e);
+                });
             });
 
         });
@@ -328,13 +346,16 @@ suite('project:', function () {
         suite('modules with dependencies:', function () {
             var result;
 
-            setup(function () {
-                result = cr.analyse([
+            setup(function (done) {
+                cr.analyse([
                     { ast: esprima.parse('require("./a");"d";', { loc: true }), path: '/d.js' },
                     { ast: esprima.parse('require("./b");"c";', { loc: true }), path: '/a/c.js' },
                     { ast: esprima.parse('require("./c");"b";', { loc: true }), path: '/a/b.js' },
                     { ast: esprima.parse('require("./a/b");require("./a/c");"a";', { loc: true }), path: '/a.js' }
-                ], mozWalker);
+                ], mozWalker, null, function(e, r) {
+                    result = r
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -392,15 +413,18 @@ suite('project:', function () {
         suite('MacCormack, Rusnak & Baldwin example:', function () {
             var result;
 
-            setup(function () {
-                result = cr.analyse([
+            setup(function (done) {
+                cr.analyse([
                     { ast: esprima.parse('"f";', { loc: true }), path: '/a/c/f.js' },
                     { ast: esprima.parse('require("./f");"e";', { loc: true }), path: '/a/c/e.js' },
                     { ast: esprima.parse('"d";', { loc: true }), path: '/a/b/d.js' },
                     { ast: esprima.parse('require("./c/e");"c";', { loc: true }), path: '/a/c.js' },
                     { ast: esprima.parse('require("./b/d");"b";', { loc: true }), path: '/a/b.js' },
                     { ast: esprima.parse('require("./a/b");require("./a/c");"a";', { loc: true }), path: '/a.js' }
-                ], mozWalker);
+                ], mozWalker, null, function(e, r) {
+                    result = r
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -490,9 +514,11 @@ suite('project:', function () {
                 resultFixture = require('./fixture/ast_moz');
             });
 
-            test('running calculations should be sufficently fast', function() {
+            test('running calculations should be sufficently fast', function(done) {
                 this.timeout(50);
-                cr.processResults(resultFixture);
+                cr.processResults(resultFixture, null, function(e, r) {
+                    done(e);
+                });
             });
 
         });

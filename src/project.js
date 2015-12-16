@@ -2,53 +2,59 @@
 
 'use strict';
 
-var path, check, moduleAnalyser;
+var path, check, async, moduleAnalyser;
 
 exports.analyse = analyse;
 exports.processResults = processResults;
 
 path = require('path');
 check = require('check-types');
+async = require('async');
 moduleAnalyser = require('./module');
 
-function analyse (modules, walker, options) {
-    // TODO: Asynchronize.
-
-    var reports;
+function analyse (modules, walker, options, next) {
     options = options || {};
 
-    check.assert.array(modules, 'Invalid modules');
-
-    reports = modules.map(function (m) {
-        var report;
-
-        check.assert.nonEmptyString(m.path, 'Invalid path');
-
-        try {
-            report = moduleAnalyser.analyse(m.ast, walker, options);
-
-            report.path = m.path;
-
-            return report;
-        } catch (error) {
-            // These error messages are useless unless they contain the module path.
-            error.message = m.path + ': ' + error.message;
-            throw error;
-        }
-    }, []);
-
-    if (options.skipCalculation) {
-        return {
-            reports: reports
-        };
+    try {
+        check.assert.array(modules, 'Invalid modules');
+    } catch (e) {
+        return next(e);
     }
 
-    return processResults({
-        reports: reports,
-    }, options.noCoreSize);
+    function analyzeModule(module, next) {
+        try {
+            check.assert.nonEmptyString(module.path, 'Invalid path');
+        } catch (e) {
+            return next(e);
+        }
+
+        moduleAnalyser.analyse(module.ast, walker, options, function(e, report) {
+            if (e) {
+              e.message = module.path + ': ' + e.message;
+              return next(e);
+            }
+
+            report.path = module.path;
+            next(null, report);
+        });
+    };
+
+    async.map(modules, async.ensureAsync(analyzeModule), function (e, reports) {
+        if (e) return next(e);
+
+        if (options.skipCalculation) {
+            return next(null, {
+                reports: reports
+            });
+        }
+
+        async.ensureAsync(processResults)({
+            reports: reports,
+        }, options.noCoreSize, next);
+    });
 }
 
-function processResults(result, noCoreSize) {
+function processResults(result, noCoreSize, next) {
     createAdjacencyMatrix(result);
     if (!noCoreSize) {
         createVisibilityMatrix(result);
@@ -57,7 +63,7 @@ function processResults(result, noCoreSize) {
 
     calculateAverages(result);
 
-    return result;
+    next(null, result);
 }
 
 function createAdjacencyMatrix (result) {

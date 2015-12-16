@@ -2,37 +2,41 @@
 
 'use strict';
 
-var check = require('check-types'), report;
+var check, report;
 
 exports.analyse = analyse;
 
-function analyse (ast, walker, options) {
-    // TODO: Asynchronise
+check = require('check-types');
 
+function analyse (ast, walker, options, next) {
     var settings, currentReport, clearDependencies = true, scopeStack = [];
 
-    check.assert.object(ast, 'Invalid syntax tree');
-    check.assert.object(walker, 'Invalid walker');
-    check.assert.function(walker.walk, 'Invalid walker.walk method');
+    try {
+        check.assert.object(ast, 'Invalid syntax tree');
+        check.assert.object(walker, 'Invalid walker');
+        check.assert.function(walker.walk, 'Invalid walker.walk method');
 
-    if (check.object(options)) {
-        settings = options;
-    } else {
-        settings = getDefaultSettings();
+        if (check.object(options)) {
+            settings = options;
+        } else {
+            settings = getDefaultSettings();
+        }
+
+        // TODO: loc is moz-specific, move to walker?
+        report = createReport(ast.loc);
+
+        walker.walk(ast, settings, {
+            processNode: processNode,
+            createScope: createScope,
+            popScope: popScope
+        });
+
+        calculateMetrics(settings);
+
+        return next(null, report);
+    } catch (e) {
+        return next(e);
     }
-
-    // TODO: loc is moz-specific, move to walker?
-    report = createReport(ast.loc);
-
-    walker.walk(ast, settings, {
-        processNode: processNode,
-        createScope: createScope,
-        popScope: popScope
-    });
-
-    calculateMetrics(settings);
-
-    return report;
 
     function processNode (node, syntax) {
         processLloc(node, syntax, currentReport);

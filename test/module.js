@@ -36,51 +36,55 @@ suite('module:', function () {
             assert.isFunction(escomplex.analyse);
         });
 
-        test('analyse does not throw with valid arguments', function () {
-            assert.doesNotThrow(function () {
-                escomplex.analyse({
-                    body: [],
-                    loc: {
-                        start: {
-                            line: 0
-                        },
-                        end: {
-                            line: 0
-                        }
+        test('analyse does not return error with valid arguments', function (done) {
+            escomplex.analyse({
+                body: [],
+                loc: {
+                    start: {
+                        line: 0
+                    },
+                    end: {
+                        line: 0
                     }
-                }, mozWalker);
+                }
+            }, mozWalker, null, function(e) {
+                assert.isNull(e);
+                done();
             });
         });
 
-        test('analyse throws when ast has no body', function () {
-            assert.throws(function () {
-                escomplex.analyse({
-                    loc: {
-                        start: {
-                            line: 0
-                        },
-                        end: {
-                            line: 0
-                        }
+        test('analyse returns error when ast has no body', function (done) {
+            escomplex.analyse({
+                loc: {
+                    start: {
+                        line: 0
+                    },
+                    end: {
+                        line: 0
                     }
-                }, mozWalker);
+                }
+            }, mozWalker, null, function(e) {
+                assert.isNotNull(e);
+                done();
             });
         });
 
-        test('analyse throws when ast is string', function () {
-            assert.throws(function () {
-                escomplex.analyse('console.log("foo");', mozWalker);
+        test('analyse returns error when ast is string', function (done) {
+            escomplex.analyse('console.log("foo");', mozWalker, null, function(e) {
+                assert.isNotNull(e);
+                done();
             });
         });
 
-        test('analyse throws when ast is array', function () {
-            assert.throws(function () {
-                escomplex.analyse([], mozWalker);
+        test('analyse returns error when ast is array', function (done) {
+            escomplex.analyse([], mozWalker, null, function(e) {
+                assert.isNotNull(e);
+                done();
             });
         });
 
-        test('analyse returns object', function () {
-            assert.isObject(escomplex.analyse({
+        test('analyse returns object', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -90,11 +94,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker));
+            }, mozWalker, null, function(e, report) {
+                assert.isObject(report);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate object', function () {
-            assert.isObject(escomplex.analyse({
+        test('analyse returns aggregate object', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -104,11 +111,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate);
+            }, mozWalker, null, function(e, report) {
+                assert.isObject(report.aggregate);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate lines of code property', function () {
-            assert.isObject(escomplex.analyse({
+        test('analyse returns aggregate lines of code property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -118,11 +128,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.sloc);
+            }, mozWalker, null, function(e, report) {
+                assert.isObject(report.aggregate.sloc);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate physical lines of code property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate physical lines of code property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -132,11 +145,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.sloc.physical);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.sloc.physical);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate logical lines of code property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate logical lines of code property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -146,11 +162,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.sloc.logical);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.sloc.logical);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate cyclomatic complexity property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate cyclomatic complexity property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -160,11 +179,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.cyclomatic);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.cyclomatic);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate cyclomatic complexity density property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate cyclomatic complexity density property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -174,11 +196,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.cyclomaticDensity);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.cyclomaticDensity);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead property', function () {
-            assert.isObject(escomplex.analyse({
+        test('analyse returns aggregate halstead property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -188,11 +213,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead);
+            }, mozWalker, null, function(e, report) {
+                assert.isObject(report.aggregate.halstead);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead operators property', function () {
-            assert.isObject(escomplex.analyse({
+        test('analyse returns aggregate halstead operators property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -202,11 +230,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operators);
+            }, mozWalker, null, function(e, report) {
+                assert.isObject(report.aggregate.halstead.operators);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead total operators property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate halstead total operators property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -216,11 +247,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operators.total);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.halstead.operators.total);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead distinct operators property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate halstead distinct operators property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -230,11 +264,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operators.distinct);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.halstead.operators.distinct);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead operator identifiers property', function () {
-            assert.isArray(escomplex.analyse({
+        test('analyse returns aggregate halstead operator identifiers property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -244,11 +281,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operators.identifiers);
+            }, mozWalker, null, function(e, report) {
+                assert.isArray(report.aggregate.halstead.operators.identifiers);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead operands property', function () {
-            assert.isObject(escomplex.analyse({
+        test('analyse returns aggregate halstead operands property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -258,11 +298,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operands);
+            }, mozWalker, null, function(e, report) {
+                assert.isObject(report.aggregate.halstead.operands);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead total operands property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate halstead total operands property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -272,11 +315,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operands.total);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.halstead.operands.total);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead distinct operands property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns aggregate halstead distinct operands property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -286,11 +332,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operands.distinct);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.aggregate.halstead.operands.distinct);
+                done(e);
+            });
         });
 
-        test('analyse returns aggregate halstead operand identifiers property', function () {
-            assert.isArray(escomplex.analyse({
+        test('analyse returns aggregate halstead operand identifiers property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -300,11 +349,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).aggregate.halstead.operands.identifiers);
+            }, mozWalker, null, function(e, report) {
+                assert.isArray(report.aggregate.halstead.operands.identifiers);
+                done(e);
+            });
         });
 
-        test('analyse returns maintainability property', function () {
-            assert.isNumber(escomplex.analyse({
+        test('analyse returns maintainability property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -314,11 +366,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).maintainability);
+            }, mozWalker, null, function(e, report) {
+                assert.isNumber(report.maintainability);
+                done(e);
+            });
         });
 
-        test('analyse returns functions property', function () {
-            assert.isArray(escomplex.analyse({
+        test('analyse returns functions property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -328,11 +383,14 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).functions);
+            }, mozWalker, null, function(e, report) {
+                assert.isArray(report.functions);
+                done(e);
+            });
         });
 
-        test('analyse returns dependencies property', function () {
-            assert.isArray(escomplex.analyse({
+        test('analyse returns dependencies property', function (done) {
+            escomplex.analyse({
                 body: [],
                 loc: {
                     start: {
@@ -342,14 +400,20 @@ suite('module:', function () {
                         line: 0
                     }
                 }
-            }, mozWalker).dependencies);
+            }, mozWalker, null, function(e, report) {
+                assert.isArray(report.dependencies);
+                done(e);
+            });
         });
 
         suite('function call:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('parseInt("10", 10);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('parseInt("10", 10);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -466,8 +530,11 @@ suite('module:', function () {
         suite('condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('if (true) { "foo"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('if (true) { "foo"; }', { loc: true }), mozWalker , null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -580,8 +647,11 @@ suite('module:', function () {
         suite('condition with alternate:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('if (true) { "foo"; } else { "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('if (true) { "foo"; } else { "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -666,8 +736,11 @@ suite('module:', function () {
         suite('dual condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('if (true) { "foo"; } if (false) { "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('if (true) { "foo"; } if (false) { "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -728,8 +801,11 @@ suite('module:', function () {
         suite('alternate dual condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('if (true) { "foo"; } else if (false) { "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('if (true) { "foo"; } else if (false) { "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -778,8 +854,11 @@ suite('module:', function () {
         suite('nested condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('if (true) { "foo"; if (false) { "bar"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('if (true) { "foo"; if (false) { "bar"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -798,8 +877,11 @@ suite('module:', function () {
         suite('switch statement:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: "foo"; break; case 2: "bar"; break; default: "baz"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: "foo"; break; case 2: "bar"; break; default: "baz"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -843,8 +925,11 @@ suite('module:', function () {
         suite('switch statement with fall-through case:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: case 2: "foo"; break; default: "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: case 2: "foo"; break; default: "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -883,8 +968,11 @@ suite('module:', function () {
         suite('switch statement containing condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: "foo"; break; case 2: "bar"; break; default: if (true) { "baz"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: "foo"; break; case 2: "bar"; break; default: if (true) { "baz"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -923,8 +1011,11 @@ suite('module:', function () {
         suite('for loop:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var i; for (i = 0; i < 10; i += 1) { "foo"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var i; for (i = 0; i < 10; i += 1) { "foo"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -975,8 +1066,11 @@ suite('module:', function () {
         suite('for loop containing condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var i; for (i = 0; i < 10; i += 1) { if (true) { "foo"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var i; for (i = 0; i < 10; i += 1) { if (true) { "foo"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1007,8 +1101,11 @@ suite('module:', function () {
         suite('for...in loop:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var property; for (property in { foo: "bar", baz: "qux" }) { "wibble"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var property; for (property in { foo: "bar", baz: "qux" }) { "wibble"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1059,8 +1156,11 @@ suite('module:', function () {
         suite('for...in loop containing condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var property, object = { foo: "bar", baz: "qux" }; for (property in object) { if (object.hasOwnProperty(property)) { "wibble"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var property, object = { foo: "bar", baz: "qux" }; for (property in object) { if (object.hasOwnProperty(property)) { "wibble"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1091,8 +1191,11 @@ suite('module:', function () {
         suite('while loop:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('while (true) { "foo"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('while (true) { "foo"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1131,8 +1234,11 @@ suite('module:', function () {
         suite('while loop containing condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('while (true) { if (true) { "foo"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('while (true) { if (true) { "foo"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1163,8 +1269,11 @@ suite('module:', function () {
         suite('do...while loop:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('do { "foo"; } while (true)', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('do { "foo"; } while (true)', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1203,8 +1312,11 @@ suite('module:', function () {
         suite('do...while loop containing condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('do { if (true) { "foo"; } } while (true)', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('do { if (true) { "foo"; } } while (true)', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1235,8 +1347,11 @@ suite('module:', function () {
         suite('try...catch:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('try { "foo"; } catch (e) { e.message; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('try { "foo"; } catch (e) { e.message; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1275,8 +1390,11 @@ suite('module:', function () {
         suite('try containing condition', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('try { if (true) { "foo"; } } catch (e) { "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('try { if (true) { "foo"; } } catch (e) { "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1307,8 +1425,11 @@ suite('module:', function () {
         suite('catch containing condition', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('try { "foo"; } catch (e) { if (true) { "bar"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('try { "foo"; } catch (e) { if (true) { "bar"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1339,8 +1460,11 @@ suite('module:', function () {
         suite('function declaration:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1447,8 +1571,11 @@ suite('module:', function () {
         suite('nested function declaration:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { bar(); function bar () { "baz"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { bar(); function bar () { "baz"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1499,8 +1626,11 @@ suite('module:', function () {
         suite('function declaration containing condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { if (true) { "bar"; } }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { if (true) { "bar"; } }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1539,8 +1669,11 @@ suite('module:', function () {
         suite('assignment expression', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = "bar";', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = "bar";', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1579,8 +1712,11 @@ suite('module:', function () {
         suite('ternary condtional expression assigned to variable:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = true ? "bar" : "baz";', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = true ? "bar" : "baz";', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1615,8 +1751,11 @@ suite('module:', function () {
         suite('nested ternary condtional expression:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = true ? "bar" : (false ? "baz" : "qux");', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = true ? "bar" : (false ? "baz" : "qux");', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1651,8 +1790,11 @@ suite('module:', function () {
         suite('logical or expression assigned to variable:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = true || false;', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = true || false;', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1687,8 +1829,11 @@ suite('module:', function () {
         suite('anonymous function assigned to variable:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = function () { "bar"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = function () { "bar"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1727,8 +1872,11 @@ suite('module:', function () {
         suite('named function assigned to variable:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = function bar () { "baz"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = function bar () { "baz"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1755,8 +1903,11 @@ suite('module:', function () {
         suite('ternary condtional expression returned from function:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { return true ? "bar" : "baz"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { return true ? "bar" : "baz"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1795,8 +1946,11 @@ suite('module:', function () {
         suite('logical or expression returned from function:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { return true || false; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { return true || false; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1827,8 +1981,11 @@ suite('module:', function () {
         suite('anonymous function returned from function:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { return function () { "bar"; }; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { return function () { "bar"; }; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1871,8 +2028,11 @@ suite('module:', function () {
         suite('named function returned from function:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { return function bar () { "baz"; }; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { return function bar () { "baz"; }; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1895,8 +2055,11 @@ suite('module:', function () {
         suite('ternary condtional expression passed as argument:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('parseInt("10", true ? 10 : 8);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('parseInt("10", true ? 10 : 8);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1927,8 +2090,11 @@ suite('module:', function () {
         suite('logical or expression passed as argument:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('parseInt("10", 10 || 8);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('parseInt("10", 10 || 8);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1943,8 +2109,11 @@ suite('module:', function () {
         suite('anonymous function passed as argument:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('setTimeout(function () { "foo"; }, 1000);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('setTimeout(function () { "foo"; }, 1000);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1983,8 +2152,11 @@ suite('module:', function () {
         suite('named function passed as argument:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('setTimeout(function foo () { "bar"; }, 1000);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('setTimeout(function foo () { "bar"; }, 1000);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -1999,8 +2171,11 @@ suite('module:', function () {
         suite('logical or expression with logicalor false:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = true || false;', { loc: true }), mozWalker, { logicalor: false });
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = true || false;', { loc: true }), mozWalker, { logicalor: false }, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2015,8 +2190,11 @@ suite('module:', function () {
         suite('switch statement with switchcase false:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: "foo"; break; case 2: "bar"; break; default: "baz"; }', { loc: true }), mozWalker, { switchcase: false });
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('switch (Date.now()) { case 1: "foo"; break; case 2: "bar"; break; default: "baz"; }', { loc: true }), mozWalker, { switchcase: false }, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2031,8 +2209,11 @@ suite('module:', function () {
         suite('for...in loop with forin true:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var property; for (property in { foo: "bar", baz: "qux" }) { "wibble"; }', { loc: true }), mozWalker, { forin: true });
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var property; for (property in { foo: "bar", baz: "qux" }) { "wibble"; }', { loc: true }), mozWalker, { forin: true }, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2047,8 +2228,11 @@ suite('module:', function () {
         suite('try...catch with trycatch true:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('try { "foo"; } catch (e) { e.message; }', { loc: true }), mozWalker, { trycatch: true });
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('try { "foo"; } catch (e) { e.message; }', { loc: true }), mozWalker, { trycatch: true }, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2063,8 +2247,11 @@ suite('module:', function () {
         suite('IIFE:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('(function (foo) { if (foo === "foo") { console.log(foo); return; } "bar"; }("foo"));', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('(function (foo) { if (foo === "foo") { console.log(foo); return; } "bar"; }("foo"));', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2115,8 +2302,11 @@ suite('module:', function () {
         suite('logical and condition:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('if ("foo" && "bar") { "baz"; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('if ("foo" && "bar") { "baz"; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2151,8 +2341,11 @@ suite('module:', function () {
         suite('call on function object:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('(function () { "foo"; }).call(this);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('(function () { "foo"; }).call(this);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2187,8 +2380,11 @@ suite('module:', function () {
         suite('anonymous function assigned to property:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = {}; foo.bar = function () { "foobar"; };', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = {}; foo.bar = function () { "foobar"; };', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2227,8 +2423,11 @@ suite('module:', function () {
         suite('anonymous function assigned to property of literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('"".bar = function () { "bar"; };', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('"".bar = function () { "bar"; };', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2251,8 +2450,11 @@ suite('module:', function () {
         suite('empty object literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = {};', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = {};', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2291,8 +2493,11 @@ suite('module:', function () {
         suite('function property of literal object:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = { bar: "bar", baz: function () { "baz"; } };', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = { bar: "bar", baz: function () { "baz"; } };', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2331,8 +2536,11 @@ suite('module:', function () {
         suite('duplicate function properties of literal object:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = { bar: function () { if (true) { "bar"; } }, bar: function () { "bar"; } };', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = { bar: function () { if (true) { "bar"; } }, bar: function () { "bar"; } };', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2367,8 +2575,11 @@ suite('module:', function () {
         suite('throw exception:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('try { throw new Error("foo"); } catch (e) { alert(error.message); }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('try { throw new Error("foo"); } catch (e) { alert(error.message); }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2403,8 +2614,11 @@ suite('module:', function () {
         suite('prefix and postfix increment:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var a = 0; ++a; a++;', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var a = 0; ++a; a++;', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2443,8 +2657,11 @@ suite('module:', function () {
         suite('array literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('[ "foo", "bar" ];', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('[ "foo", "bar" ];', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2483,8 +2700,11 @@ suite('module:', function () {
         suite('multiple physical lines:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('// This is a\n// multi-line\n// comment.\nparseInt(\n\t(function () {\n\t\t// Moar\n\t\t// commentz!\n\t\treturn [\n\t\t\t"1",\n\t\t\t"0"\n\t\t].join("");\n\t}()),\n\t10\n);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('// This is a\n// multi-line\n// comment.\nparseInt(\n\t(function () {\n\t\t// Moar\n\t\t// commentz!\n\t\treturn [\n\t\t\t"1",\n\t\t\t"0"\n\t\t].join("");\n\t}()),\n\t10\n);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2519,8 +2739,11 @@ suite('module:', function () {
         suite('multiple functions:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2563,8 +2786,11 @@ suite('module:', function () {
         suite('issue 3 / reddit.ISV_Damocles:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var callback = arguments[arguments.length-1] instanceof Function ? arguments[arguments.length-1] : function() {};', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var callback = arguments[arguments.length-1] instanceof Function ? arguments[arguments.length-1] : function() {};', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2579,8 +2805,11 @@ suite('module:', function () {
         suite('empty return:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { return; }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { return; }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2619,8 +2848,11 @@ suite('module:', function () {
         suite('Empty nested functions', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo () { function bar () {} }', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo () { function bar () {} }', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2635,8 +2867,11 @@ suite('module:', function () {
         suite('Microsoft variant maintainability index:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }', { loc: true }), mozWalker, { newmi: true });
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo (a, b) { if (a) { b(a); } else { a(b); } } function bar (c, d) { var i; for (i = 0; i < c.length; i += 1) { d += 1; } console.log(d); }', { loc: true }), mozWalker, { newmi: true }, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2651,8 +2886,11 @@ suite('module:', function () {
         suite('Functions with consistent parameter counts:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo (a) {} function bar (b) {} function baz (c) {}', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo (a) {} function bar (b) {} function baz (c) {}', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2671,8 +2909,11 @@ suite('module:', function () {
         suite('Functions with inconsistent parameter counts:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('function foo (a, b, c, d, e) {} function bar (a, b, c, d, e) {} function baz (a) {}', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('function foo (a, b, c, d, e) {} function bar (a, b, c, d, e) {} function baz (a) {}', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2691,8 +2932,11 @@ suite('module:', function () {
         suite('CommonJS require literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require("./foo");', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require("./foo");', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2714,8 +2958,11 @@ suite('module:', function () {
         suite('alternative CommonJS require literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require("./bar");', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require("./bar");', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2730,8 +2977,11 @@ suite('module:', function () {
         suite('CommonJS require multiple:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require("./foo");\nrequire("./bar");\n\nrequire("./baz");', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require("./foo");\nrequire("./bar");\n\nrequire("./baz");', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2755,8 +3005,11 @@ suite('module:', function () {
         suite('CommonJS require variable:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = "./foo";require(foo);', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = "./foo";require(foo);', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2778,8 +3031,11 @@ suite('module:', function () {
         suite('AMD require literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require([ "foo" ], function (foo) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require([ "foo" ], function (foo) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2801,8 +3057,11 @@ suite('module:', function () {
         suite('alternative AMD require literal:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require([ "bar" ], function (barModule) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require([ "bar" ], function (barModule) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2817,8 +3076,11 @@ suite('module:', function () {
         suite('AMD require multiple:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require([ "foo", "bar", "baz" ], function (foo, bar, baz) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require([ "foo", "bar", "baz" ], function (foo, bar, baz) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2843,8 +3105,11 @@ suite('module:', function () {
         suite('AMD require variable:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = "foo";\nrequire([ foo ], function (foo) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = "foo";\nrequire([ foo ], function (foo) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2865,8 +3130,11 @@ suite('module:', function () {
         suite('AMD require variable array:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('var foo = [ "foo" ];\nrequire(foo, function (foo) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('var foo = [ "foo" ];\nrequire(foo, function (foo) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2886,8 +3154,11 @@ suite('module:', function () {
         suite('AMD require.config:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require.config({\n\tpaths: {\n\t\tfoo: "path/to/foo",\n\t\tbaz: "../wibble"\n\t}\n});\nrequire([ "foo", "bar", "baz" ], function (foo, bar, baz) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require.config({\n\tpaths: {\n\t\tfoo: "path/to/foo",\n\t\tbaz: "../wibble"\n\t}\n});\nrequire([ "foo", "bar", "baz" ], function (foo, bar, baz) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2914,8 +3185,11 @@ suite('module:', function () {
         suite('AMD require literal string:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('require("foo", function (foo) {});', { loc: true }), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('require("foo", function (foo) {});', { loc: true }), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {
@@ -2936,8 +3210,11 @@ suite('module:', function () {
         suite('Missing loc data:', function () {
             var report;
 
-            setup(function () {
-                report = escomplex.analyse(esprima.parse('parseInt("10", 10);'), mozWalker);
+            setup(function (done) {
+                escomplex.analyse(esprima.parse('parseInt("10", 10);'), mozWalker, null, function(e, r) {
+                    report = r;
+                    done(e);
+                });
             });
 
             teardown(function () {

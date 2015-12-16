@@ -27,6 +27,7 @@
     "ast"
   ],
   "dependencies": {
+    "async": "^1.5.0",
     "check-types": "^5.1.0"
   },
   "devDependencies": {
