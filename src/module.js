@@ -2,14 +2,12 @@
 
 'use strict';
 
-var check, report;
-
 exports.analyse = analyse;
 
-check = require('check-types');
+var check = require('check-types');
 
 function analyse (ast, walker, options, next) {
-    var settings, currentReport, clearDependencies = true, scopeStack = [];
+    var settings, currentReport, clearDependencies = true, scopeStack = [], report;
 
     try {
         check.assert.object(ast, 'Invalid syntax tree');
@@ -31,7 +29,7 @@ function analyse (ast, walker, options, next) {
             popScope: popScope
         });
 
-        calculateMetrics(settings);
+        calculateMetrics(report, settings);
 
         return next(null, report);
     } catch (e) {
@@ -39,12 +37,12 @@ function analyse (ast, walker, options, next) {
     }
 
     function processNode (node, syntax) {
-        processLloc(node, syntax, currentReport);
-        processCyclomatic(node, syntax, currentReport);
-        processOperators(node, syntax, currentReport);
-        processOperands(node, syntax, currentReport);
+        processLloc(report, node, syntax, currentReport);
+        processCyclomatic(report, node, syntax, currentReport);
+        processOperators(report, node, syntax, currentReport);
+        processOperands(report, node, syntax, currentReport);
 
-        if (processDependencies(node, syntax, clearDependencies)) {
+        if (processDependencies(report, node, syntax, clearDependencies)) {
             // HACK: This will fail with async or if other syntax than CallExpression introduces dependencies.
             // TODO: Come up with a less crude approach.
             clearDependencies = false;
@@ -123,8 +121,8 @@ function createInitialHalsteadItemState () {
     };
 }
 
-function processLloc (node, syntax, currentReport) {
-    incrementCounter(node, syntax, 'lloc', incrementLogicalSloc, currentReport);
+function processLloc (report, node, syntax, currentReport) {
+    incrementCounter(node, syntax, 'lloc', incrementLogicalSloc.bind(null, report), currentReport);
 }
 
 function incrementCounter (node, syntax, name, incrementFn, currentReport) {
@@ -137,7 +135,7 @@ function incrementCounter (node, syntax, name, incrementFn, currentReport) {
     }
 }
 
-function incrementLogicalSloc (currentReport, amount) {
+function incrementLogicalSloc (report, currentReport, amount) {
     report.aggregate.sloc.logical += amount;
 
     if (currentReport) {
@@ -145,11 +143,11 @@ function incrementLogicalSloc (currentReport, amount) {
     }
 }
 
-function processCyclomatic (node, syntax, currentReport) {
-    incrementCounter(node, syntax, 'cyclomatic', incrementCyclomatic, currentReport);
+function processCyclomatic (report, node, syntax, currentReport) {
+    incrementCounter(node, syntax, 'cyclomatic', incrementCyclomatic.bind(null, report), currentReport);
 }
 
-function incrementCyclomatic (currentReport, amount) {
+function incrementCyclomatic (report, currentReport, amount) {
     report.aggregate.cyclomatic += amount;
 
     if (currentReport) {
@@ -157,15 +155,15 @@ function incrementCyclomatic (currentReport, amount) {
     }
 }
 
-function processOperators (node, syntax, currentReport) {
-    processHalsteadMetric(node, syntax, 'operators', currentReport);
+function processOperators (report, node, syntax, currentReport) {
+    processHalsteadMetric(report, node, syntax, 'operators', currentReport);
 }
 
-function processOperands (node, syntax, currentReport) {
-    processHalsteadMetric(node, syntax, 'operands', currentReport);
+function processOperands (report, node, syntax, currentReport) {
+    processHalsteadMetric(report, node, syntax, 'operands', currentReport);
 }
 
-function processHalsteadMetric (node, syntax, metric, currentReport) {
+function processHalsteadMetric (report, node, syntax, metric, currentReport) {
     if (check.array(syntax[metric])) {
         syntax[metric].forEach(function (s) {
             var identifier;
@@ -177,13 +175,13 @@ function processHalsteadMetric (node, syntax, metric, currentReport) {
             }
 
             if (check.function(s.filter) === false || s.filter(node) === true) {
-                halsteadItemEncountered(currentReport, metric, identifier);
+                halsteadItemEncountered(report, currentReport, metric, identifier);
             }
         });
     }
 }
 
-function halsteadItemEncountered (currentReport, metric, identifier) {
+function halsteadItemEncountered (report, currentReport, metric, identifier) {
     if (currentReport) {
         incrementHalsteadItems(currentReport, metric, identifier);
     }
@@ -224,7 +222,7 @@ function incrementTotalHalsteadItems (baseReport, metric) {
     incrementHalsteadMetric(baseReport, metric, 'total');
 }
 
-function processDependencies (node, syntax, clearDependencies) {
+function processDependencies (report, node, syntax, clearDependencies) {
     var dependencies;
 
     if (check.function(syntax.dependencies)) {
@@ -239,7 +237,7 @@ function processDependencies (node, syntax, clearDependencies) {
     return false;
 }
 
-function calculateMetrics (settings) {
+function calculateMetrics (report, settings) {
     var count, indices, sums, averages;
 
     count = report.functions.length;
@@ -268,6 +266,7 @@ function calculateMetrics (settings) {
     averages = sums.map(function (sum) { return sum / count; });
 
     calculateMaintainabilityIndex(
+        report,
         averages[indices.effort],
         averages[indices.cyclomatic],
         averages[indices.loc],
@@ -316,7 +315,7 @@ function sumMaintainabilityMetrics (sums, indices, data) {
     sums[indices.params] += data.params;
 }
 
-function calculateMaintainabilityIndex (averageEffort, averageCyclomatic, averageLoc, settings) {
+function calculateMaintainabilityIndex (report, averageEffort, averageCyclomatic, averageLoc, settings) {
     if (averageCyclomatic === 0) {
         throw new Error('Encountered function with cyclomatic complexity zero!');
     }
